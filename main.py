@@ -1,4 +1,4 @@
-from pprint import pprint, pformat
+from pprint import pprint
 from dict_scrape import *
 
 if __name__ == '__main__':

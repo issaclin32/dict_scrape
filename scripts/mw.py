@@ -2,9 +2,9 @@ import re
 from typing import Optional
 from urllib.error import HTTPError
 
-from utils import url_to_soup as _url_to_soup
-from utils import ezip as _ezip
-from enums import OnlineDict
+from dict_scrape.utils import url_to_soup as _url_to_soup
+from dict_scrape.utils import ezip as _ezip
+
 
 def MW_Dictionary(keyword: str) -> Optional[list]:
     """
