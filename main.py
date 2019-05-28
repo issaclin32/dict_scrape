@@ -1,6 +1,5 @@
-from pprint import pprint
+from pprint import pprint, pformat
 from dict_scrape import *
-from dict_scrape import pprint_HTML
 
 if __name__ == '__main__':
 
@@ -16,13 +15,16 @@ if __name__ == '__main__':
         'sjkfhsdjkfhaks'
     ]
 
-    #pprint_HTML('https://www.merriam-webster.com/thesaurus/folderol')
-
-    pprint( MW_Dictionary('hash') )
 
     '''
+    output = MW_Dictionary('hash')
+    pprint(output)
+
+    with open('output.log', 'w', encoding='utf8') as f:
+        f.write( str(output) )
+    '''
+
     for word in test_cases:
-        result = Cam(word, dict_name='EN-CHT')
+        result = Cam(word, dict_name=OnlineDict.Cam_EN_ZH_HANT)
         if result:
             pprint(result)
-    '''

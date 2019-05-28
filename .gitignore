@@ -1,2 +1,4 @@
+# .idea: project settings directory for IntelliJ IDEA / PyCharm
 .idea
 __pycache__
+*.log
