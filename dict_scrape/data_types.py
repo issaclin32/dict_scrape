@@ -45,7 +45,6 @@ class Pos(Enum):
 
 # Used for storing multi-language data for "definition", "example sentence", etc.
 # May need a better name for describing this object
-@dataclass(eq=True)
 class MLString:
     def __init__(self, content: Union[Dict[Lang, str], str]):
         if type(content) is str:
