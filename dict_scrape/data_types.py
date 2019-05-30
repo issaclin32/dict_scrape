@@ -43,6 +43,12 @@ class Pos(Enum):
     contraction = 15  # let's, I'm, etc.
 
 
+class Defi_Type(Enum):
+    definition = 0
+    thesaurus = 1
+    phrase = 2
+
+
 # Used for storing multi-language data for "definition", "example sentence", etc.
 # May need a better name for describing this object
 class MLString:
@@ -57,6 +63,9 @@ class MLString:
         else:
             raise KeyError(f'no content found for language {lang}')
 
+    def get_all(self) -> Dict[Lang, str]:
+        return self.content
+
     def has_lang(self, lang: Lang) -> bool:
         if lang in self.content.keys():
             return True
@@ -66,13 +75,21 @@ class MLString:
     def all_langs(self):
         return self.content.keys()
 
+    def __str__(self):
+        return str(vars(self))
+
+    def __repr__(self):
+        return str(vars(self))
+
+
 # Using Dataclass instead of Dict for better static checking
 # (whether the field name / types are correct)
 @dataclass(eq=True)  # eq: enable comparison
 class Definition:
     # required fields
+    type: Defi_Type
     definition: MLString
-    part_of_speech: Pos
+    part_of_speech: Pos = Pos.not_categorized
 
     # optional fields
     # TODO: more specific structure for storing pronunciation data (including mp3 URL/file)
@@ -93,4 +110,4 @@ class Definition:
     antonym_phrases: List[str] = field(default_factory=list)
 
     def __str__(self):
-        return vars(self)
+        return str(vars(self))

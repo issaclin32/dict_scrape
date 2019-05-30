@@ -4,6 +4,7 @@ from urllib.error import HTTPError
 
 from dict_scrape.utils import url_to_soup as _url_to_soup
 from dict_scrape.utils import ezip as _ezip
+from ..data_types import *
 
 
 def MW_Dictionary(keyword: str) -> Optional[list]:
@@ -38,7 +39,8 @@ def MW_Dictionary(keyword: str) -> Optional[list]:
 
     return results
 
-def MW_Thesaurus(keyword: str) -> Optional[list]:
+
+def MW_Thesaurus(keyword: str) -> Optional[List[Definition]]:
     """
     search on Merriam-Webster Thesaurus
     """
@@ -55,25 +57,27 @@ def MW_Thesaurus(keyword: str) -> Optional[list]:
     results = []
 
     for i, block in enumerate(soup.find_all('div', class_='vg')):
-        defi = {
-            'definition': block.find('span', class_='dt ').find(text=True, recursive=False).strip(),
-            'example': block.find('ul', class_='vis').find('span', class_='t').text,
-        }
-
+        defi = Definition(
+            type = Defi_Type.thesaurus,
+            definition = block.find('span', class_='dt ').find(text=True, recursive=False).strip()
+        )
+        defi.examples = [MLString(block.find('ul', class_='vis').find('span', class_='t').text)]
         headers = [d.find('b').find(text=True, recursive=False).strip() for d in block.find_all('div', class_='thes-list-header')]
-        header_conversions = {
-            'Synonyms of': 'synonyms',
-            'Near Synonyms of': 'near_synonyms',
-            'Words Related to': 'words_related',
-            'Near Antonyms of': 'near_antonyms',
-            'Antonyms of': 'antonyms',
-            'Phrases Synonymous with': 'synonym_phrases',
-            'Phrases Antonymous with': 'antonym_phrases'
-        }
-        headers = [header_conversions[h] for h in headers]
 
         for j, h in enumerate(headers):
-            defi[h] = [a.text for a in block.find_all('div', class_='thes-list-content')[j].find_all('a')]
+            lst = [a.text for a in block.find_all('div', class_='thes-list-content')[j].find_all('a')]
+            if h == 'Synonyms of':
+                defi.synonyms = lst
+            elif h == 'Near Synonyms of':
+                defi.near_synonyms = lst
+            elif h == 'Words Related to':
+                defi.words_related = lst
+            elif h == 'Antonyms of':
+                defi.antonyms = lst
+            elif h == 'Phrases Synonymous with':
+                defi.synonym_phrases = lst
+            elif h == 'Phrases Antonymous with':
+                defi.antonym_phrases = lst
 
         results.append(defi)
     return results

@@ -25,6 +25,7 @@ if __name__ == '__main__':
     '''
 
     for word in test_cases:
-        result = Cam(word, dict_name=OnlineDict.Cam_EN_ZH_HANT)
+        # result = Cam(word, dict_name=OnlineDict.Cam_EN_ZH_HANT)
+        result = MW_Thesaurus(word)
         if result:
             pprint(result)
