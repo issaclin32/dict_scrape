@@ -41,6 +41,44 @@ class Pos(Enum):
     verb_phrase = 13
     measure_word = 14  # not used in English, but commonly used in Chinese and Japanese (一"張"紙)
     contraction = 15  # let's, I'm, etc.
+    verb_transitive = 16
+    verb_intransitive = 17
+
+    def __bool__(self):
+        return self != self.not_categorized
+
+    @classmethod
+    def from_string(cls, string: str, unknown_ok: bool = True):
+        for item in cls:
+            if string.strip().lower() == item.name:
+                return item
+        else:  # if not "break"ing from the for-loop
+            if unknown_ok:
+                return cls.not_categorized
+            else:
+                raise KeyError(f'part of speech with type {string} is not defined.')
+
+    @classmethod
+    def from_abbr(cls, abbr: str, unknown_ok: bool = True):
+        abbr_table = {
+            'n': cls.noun,
+            'v': cls.verb,
+            'adj': cls.adjective,
+            'a': cls.adjective,
+            'adv': cls.adverb,
+            'pron': cls.pronoun,
+            'prep': cls.preposition,
+            'conj': cls.conjunction,
+            'aux': cls.auxiliary_verb,
+            'phr': cls.phrase
+        }
+        if abbr in abbr_table.keys():
+            return abbr_table[abbr]
+        else:
+            if unknown_ok:
+                return cls.not_categorized
+            else:
+                raise KeyError(f'part of speech with abbreviation {abbr} is not defined.')
 
 
 class Defi_Type(Enum):
@@ -54,7 +92,7 @@ class Defi_Type(Enum):
 class MLString:
     def __init__(self, content: Union[Dict[Lang, str], str]):
         if type(content) is str:
-            content = {Lang.EN, content}  # treat as English by default
+            content = {Lang.EN: content}  # treat as English by default
         self.content = content
 
     def get(self, lang: Lang) -> str:
@@ -76,10 +114,10 @@ class MLString:
         return self.content.keys()
 
     def __str__(self):
-        return str(vars(self))
+        return '  '.join([ f'{k.value}: {v}  ' for k, v in self.content.items()])
 
     def __repr__(self):
-        return str(vars(self))
+        return str(self)
 
 
 # Using Dataclass instead of Dict for better static checking
@@ -93,12 +131,14 @@ class Definition:
 
     # optional fields
     # TODO: more specific structure for storing pronunciation data (including mp3 URL/file)
+    term: str = ''  # used in related phrases
     examples: List[MLString] = field(default_factory=list)
     guide_word: str = ''
     irregular_inflections: List[str] = field(default_factory=list)
     usage_tags: List[str] = field(default_factory=list)
     IPA_US: str = ''
     IPA_UK: str = ''
+
 
     # fields for thesaurus results
     synonyms: List[str] = field(default_factory=list)
@@ -110,4 +150,8 @@ class Definition:
     antonym_phrases: List[str] = field(default_factory=list)
 
     def __str__(self):
-        return str(vars(self))
+        ret = ''
+        for k, v in vars(self).items():
+            if bool(v):
+                ret += f'{k}: {v},\n'
+        return ret
